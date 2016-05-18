@@ -3,6 +3,10 @@ var scatterPlotService = function () {
     return {
         generate: function (scatterPlot, dataset, countryHelper) {
 
+            var w = 1500;
+            var h = 600;
+            var padding = 30;
+            
             var xScale = d3.scale.linear()
                 .domain([d3.min(dataset, function (d) {
                     return d.acc;
