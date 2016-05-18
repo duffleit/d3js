@@ -1,235 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <title>D3js - CSV</title>
-        <script type="text/javascript" src="https://d3js.org/d3.v3.min.js"></script>
-  		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-    	<style>
-    	.axis path,
-		.axis line {
-		    fill: none;
-		    stroke: black;
-		    shape-rendering: crispEdges;
-		}
-		.axis text {
-		    font-family: sans-serif;
-		    font-size: 11px;
-		}
-		.legendItem{
-			border: 0px;
-			border-right: 20px solid black;
-			text-align: right;
-			padding-right: 10px;
-			margin-top: 4px;
-		}
-		.tooltip {
-			position: absolute;
-			width: 200px;
-			background-color: white;
-			border: 1px solid black;
-			pointer-events: none;
-			padding: 3px;
-		}
-		</style>
-    </head>
-    <body>
-        <div></div>
-    	<table class="table table-striped">
-    	</table>
-        <script type="text/javascript">
+<head>
+    <meta charset="utf-8">
 
-			//Width and height
-			var w = 1500;
-			var h = 600;
-			var padding = 20;
+    <title>D3js - Cars</title>
 
+    <script type="text/javascript" src="https://d3js.org/d3.v3.min.js"></script>
+    <script type="text/javascript" src="scripts/helper/countryHelper.js"></script>
+    <script type="text/javascript" src="scripts/helper/labelHelper.js"></script>
+    <script type="text/javascript" src="scripts/csvLoader.js"></script>
+    <script type="text/javascript" src="scripts/services/tableService.js"></script>
+    <script type="text/javascript" src="scripts/services/scatterPlotService.js"></script>
 
-			var countryHelper = function(){
-				return{
-					getAvaiableCountries: function(){
-						return ["USA", "Europe", "Japan"]
-					}
-				}
-			}()
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="styles/main.css">
 
-			var labelHelper = function(){
-				var labels = {
-					"acc": "Acceleration",
-					"cyl": "Cylinders",
-					"ed": "Engine displacement",
-					"hp": "Horsepower",
-					"mpg": "Miles per gallon",
-					"my": "Model Year",
-					"name": "Name",
-					"ori": "Origin",
-					"weight": "Vehicle weight"
-				}
+</head>
+<body>
+<div id="scatterPlot"></div>
+<table id="list" class="table table-striped">
+</table>
 
-				return{
-					getProperty: function(propertyName){
-						return labels [propertyName]
-					}
-				}
-			}()
+<script type="text/javascript">
 
-	
-        	var float = function(value){
-        		return isNaN(parseFloat(value)) ? 0 : parseFloat(value.replace(",", "."));
-        	}
+    var w = 1500;
+    var h = 600;
+    var padding = 20;
 
-        	var dsv = d3.dsv(";", "text/plain");
-            
-            dsv("cars.csv", 
-            	function(row){
-	            	var countryOfOrigin = float(row.Origin) <= 1 
-	            					? "USA" 
-	            					: float(row.Origin) <= 2 ? "Europe" : "Japan";
+    csvLoader.load({
+        file: "data/cars.csv",
+        countryHelper: countryHelper,
+        success: function (dataSet) {
 
-	            	var currentYear = float(new Date().getFullYear().toString().substring(2));
-	            	
-	            	var year = float(row['Model year']) < currentYear 
-	            					? float("20" + float(row['Model year']))
-	            					: float("19" + float(row['Model year']))
-					
-					return{
-						"acc": float(row.Acceleration),
-						"cyl": float(row.Cylinders),
-						"ed": float(row['Engine displacement']),
-						"hp": float(row.Horsepower),
-						"mpg": float(row['Miles per gallon']),
-						"my": year,
-						"name": row.Name,
-						"ori": countryOfOrigin,
-						"weight": float(row['Vehicle weight']),
-					}
-	            }, 
-	            function(error, dataset) {
-					
-					var table = d3.select("table");
-					var keys = [];
+            tableService.generate(d3.select("#list"), dataSet, labelHelper);
+            scatterPlotService.generate(d3.select("#scatterPlot"), dataSet, countryHelper);
 
-					dataset.some(function(d) {							
-						keys = d3.keys(d);
-						return true;
-					});  
+        },
+        error: function (error) {
+            console.log(error);
+        }
+    });
 
-					var headers = table.append("thead").append("tr")
-						.selectAll("th")
-						.data(keys)
-						.enter()
-						.append("th")
-						.text(function(key) {return labelHelper.getProperty(key);})
-
-					var rows = table.append("tbody").selectAll("tr")
-						.data(dataset)
-						.enter()
-						.append("tr");
-
-					var cells = rows.selectAll("td")
-						.data(function(row) { 
-							return d3.values(row);
-						})
-						.enter()
-						.append("td")
-						.text(function(value) { return value; });
-
-					var xScale = d3.scale.linear()
-										 .domain([d3.min(dataset, function(d) { return d.acc; }), d3.max(dataset, function(d) { return d.acc; })])
-										 .range([padding, w - padding * 2]);
-
-					var yScale = d3.scale.linear()
-										 .domain([d3.min(dataset, function(d) { return d.mpg; }), d3.max(dataset, function(d) { return d.mpg; })])
-										 .range([h-padding, padding]);
-
-					var categoryScale = d3.scale.category10()
-
-					//Create SVG element
-					var svg = d3.select("body").select("div")
-								.append("svg")
-								.attr("width", w)
-								.attr("height", h);
-
-					var tooltip = d3.select("body").append("div")
-										.attr("class", "tooltip")
-										.style("opacity", 0);
-
-					//Create circles
-					svg.selectAll("circle")
-					   .data(dataset)
-					   .enter()
-					   .append("circle")
-					   .attr("cx", function(d) {
-					   		return xScale(d.acc);
-					   })
-					   .attr("cy", function(d) {
-					   		return yScale(d.mpg);
-					   })
-					   .attr("r", function(d) {
-					   		return 5;
-					   })
-					   .attr("fill", function(d){
-					   		return categoryScale(d.ori)
-					   })
-					   .on("mouseover", function(d) {
-								tooltip.transition()
-										.duration(200)
-										.style("opacity", 0.9);
-	  							tooltip.html("<b>"+d.name + 
-	  										 "</b><br/>Acceleration: " + d.acc + 
-	  										 "<br/>Miles per gallon: " + d.mpg +
-	  										 "<br/>Origin: "+ d.ori)
-	       								.style("left", (d3.event.pageX + 5) + "px")
-	       								.style("top", (d3.event.pageY - 28) + "px");
-						})
-						.on("mouseout", function(d) {
-								tooltip.transition()
-										.duration(500)
-										.style("opacity", 0);
-						});
-
-					svg.append("text")
-						.text("Acceleration")
-						.attr("text-anchor", "end")
-						.attr("transform", "translate(" + (w - padding * 2) + "," + (h - padding - 5) + ")")
-
-					svg.append("text")
-						.text("Miles per gallon")
-						.attr("text-anchor", "end")
-						.attr("transform", "translate(" + (padding + 15) + "," + padding  + ")rotate(270)")
-
-					svg.append("g")
-						.call(d3.svg.axis()
-							.scale(xScale)
-							.orient("bottom")
-						)
-						.attr("class", "axis")
-						.attr("transform", "translate(0," + (h - padding) + ")")
-
-					svg.append("g")
-					    .attr("class", "axis")
-					    .attr("transform", "translate(" + padding + ",0)")
-					    .call(d3.svg.axis()
-							.scale(yScale)
-							.orient("left")
-						);
-
-					svg
-						.append("foreignObject")
-						.attr("transform", "translate(0," + padding + ")")
-						.attr("height", "100")
-						.attr("width", w - (padding * 2))
-						.append('xhtml:div')
-						.selectAll('div')
-						.data(countryHelper.getAvaiableCountries)
-						.enter()
-						.append('div')
-							.attr("class", "legendItem")
-							.html(function(d){ return d; })
-							.style("border-color", categoryScale)
-				}
-			);
-
-        </script>
-    </body>
+</script>
+</body>
 </html>     
