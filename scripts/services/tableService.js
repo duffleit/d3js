@@ -36,7 +36,7 @@ var tableService = function () {
                     return value;
                 });
         },
-        oeElementSelectionChanged: function(cb){
+        onElementSelectionChanged: function(cb){
             rows.classed('highlighted-row',function(car) { return car.selected});
         }
     }

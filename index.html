@@ -10,6 +10,7 @@
     <script type="text/javascript" src="scripts/helper/labelHelper.js"></script>
     <script type="text/javascript" src="scripts/csvLoader.js"></script>
     <script type="text/javascript" src="scripts/services/tableService.js"></script>
+    <script type="text/javascript" src="scripts/services/histogramService.js"></script>
     <script type="text/javascript" src="scripts/services/scatterPlotService.js"></script>
 
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css">
@@ -17,7 +18,9 @@
 
 </head>
 <body>
-<div id="scatterPlot"></div>
+<div id="scatterPlot" style="float: left"></div>
+<div id="histogram" style="float: left"></div>
+<div style="clear: both"></div>
 <table id="list" class="table table-striped">
 </table>
 
@@ -28,7 +31,8 @@
         countryHelper: countryHelper,
         success: function (dataSet) {
             tableService.generate(d3.select("#list"), dataSet, labelHelper);
-            scatterPlotService.generate(d3.select("#scatterPlot"), dataSet, [tableService.oeElementSelectionChanged], countryHelper);
+            histogramService.generate(d3.select("#histogram"), dataSet);
+            scatterPlotService.generate(d3.select("#scatterPlot"), dataSet, [tableService.onElementSelectionChanged, histogramService.onElementSelectionChanged], countryHelper);
         },
         error: function (error) {
             console.log(error);

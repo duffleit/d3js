@@ -37,3 +37,8 @@ circle.out-of-brush {
 .highlighted-row{
     background-color: #FFFAE3 !important;
 }
+
+.histogram-bar{
+    fill: rgb(104, 181, 255);
+    stroke-width:1;stroke: rgb(255, 255, 255)
+}
