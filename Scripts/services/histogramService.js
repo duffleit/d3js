@@ -94,7 +94,13 @@ var histogramService = function () {
         onElementSelectionChanged: function(cb){
             initValues.div.select("*").remove();
             var selectedCars = initValues.dataSet.filter(function(car) { return car.selected});
-            createHistogram(initValues.div, selectedCars);
+
+            if(selectedCars.length < 1){
+                createHistogram(initValues.div, initValues.dataSet);
+            }
+            else{
+                createHistogram(initValues.div, selectedCars);
+            }
         }
     }
 }();
