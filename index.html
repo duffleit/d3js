@@ -32,7 +32,10 @@
         success: function (dataSet) {
             tableService.generate(d3.select("#list"), dataSet, labelHelper);
             histogramService.generate(d3.select("#histogram"), dataSet);
-            scatterPlotService.generate(d3.select("#scatterPlot"), dataSet, [tableService.onElementSelectionChanged, histogramService.onElementSelectionChanged], countryHelper);
+            scatterPlotService.generate(
+                d3.select("#scatterPlot"), dataSet, 
+                [tableService.onElementSelectionChanged, histogramService.onElementSelectionChanged],
+                countryHelper);
         },
         error: function (error) {
             console.log(error);
