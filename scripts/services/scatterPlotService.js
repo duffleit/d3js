@@ -1,12 +1,12 @@
 var scatterPlotService = function () {
 
     return {
-        generate: function (scatterPlot, dataset, countryHelper) {
+        generate: function (scatterPlot, dataset, onSelectionChangedCallbacks, countryHelper) {
 
             var w = 1500;
             var h = 600;
             var padding = 30;
-            
+
             var xScale = d3.scale.linear()
                 .domain([d3.min(dataset, function (d) {
                     return d.acc;
@@ -102,6 +102,49 @@ var scatterPlotService = function () {
                     return d;
                 })
                 .style("border-color", categoryScale)
+
+
+            var onBrushMove = function(){
+
+                brushArea = brush.extent();
+
+                var brushCoordinates = {
+                    x1: brushArea[0][0],
+                    y1: brushArea[0][1],
+                    x2: brushArea[1][0],
+                    y2: brushArea[1][1]
+                };
+
+                svg.selectAll("circle").classed("out-of-brush", function (car) {
+                    car.selected = false;
+                    return false;
+                });
+
+                svg.selectAll("circle").classed("out-of-brush", function (car) {
+
+                    var x = car.acc || 0;
+                    var y = car.mpg || 0;
+
+                    var con = x >= brushCoordinates.x1 && y >= brushCoordinates.y1 && x <= brushCoordinates.x2 && y <= brushCoordinates.y2;
+
+                    if(con) car.selected = true;
+                    return !con;
+                });
+
+                for(var i = 0; i < onSelectionChangedCallbacks.length; i++){
+                    onSelectionChangedCallbacks[i]();
+                }
+            };
+
+            var brush = d3.svg.brush()
+                        .x(xScale)
+                        .y(yScale)
+                        .on("brush", onBrushMove)
+
+            svg
+                .append('g')
+                .call(brush);
+
         }
     }
 }();

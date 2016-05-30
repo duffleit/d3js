@@ -25,3 +25,15 @@
     pointer-events: none;
     padding: 3px;
 }
+
+.extent {
+    fill: #000;
+    fill-opacity: .125;
+    stroke: #fff;
+}
+circle.out-of-brush {
+    fill: #ccc !important;
+}
+.highlighted-row{
+    background-color: #FFFAE3 !important;
+}

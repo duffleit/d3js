@@ -1,5 +1,7 @@
 var tableService = function () {
 
+    var rows;
+
     return {
         generate: function (table, dataset, labelHelper) {
 
@@ -19,7 +21,7 @@ var tableService = function () {
                     return labelHelper.getProperty(key);
                 });
 
-            var rows = table.append("tbody").selectAll("tr")
+            rows = table.append("tbody").selectAll("tr")
                 .data(dataset)
                 .enter()
                 .append("tr");
@@ -33,6 +35,9 @@ var tableService = function () {
                 .text(function (value) {
                     return value;
                 });
+        },
+        oeElementSelectionChanged: function(cb){
+            rows.classed('highlighted-row',function(car) { return car.selected});
         }
     }
 }();

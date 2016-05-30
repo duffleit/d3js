@@ -5,14 +5,14 @@
 
     <title>D3js - Cars</title>
 
-    <script type="text/javascript" src="https://d3js.org/d3.v3.min.js"></script>
+    <script type="text/javascript" src="node_modules/d3/d3.js"></script>
     <script type="text/javascript" src="scripts/helper/countryHelper.js"></script>
     <script type="text/javascript" src="scripts/helper/labelHelper.js"></script>
     <script type="text/javascript" src="scripts/csvLoader.js"></script>
     <script type="text/javascript" src="scripts/services/tableService.js"></script>
     <script type="text/javascript" src="scripts/services/scatterPlotService.js"></script>
 
-    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css">
     <link rel="stylesheet" href="styles/main.css">
 
 </head>
@@ -27,10 +27,8 @@
         file: "data/cars.csv",
         countryHelper: countryHelper,
         success: function (dataSet) {
-
             tableService.generate(d3.select("#list"), dataSet, labelHelper);
-            scatterPlotService.generate(d3.select("#scatterPlot"), dataSet, countryHelper);
-
+            scatterPlotService.generate(d3.select("#scatterPlot"), dataSet, [tableService.oeElementSelectionChanged], countryHelper);
         },
         error: function (error) {
             console.log(error);
