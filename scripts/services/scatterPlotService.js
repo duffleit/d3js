@@ -3,9 +3,8 @@ var scatterPlotService = function () {
     return {
         generate: function (scatterPlot, dataset, onSelectionChangedCallbacks, countryHelper) {
 
-            var w = 1500;
-            var h = 600;
-            var padding = 30;
+            var margin = 25;
+            var size = { width: 900, height: 600};
 
             var xScale = d3.scale.linear()
                 .domain([d3.min(dataset, function (d) {
@@ -13,7 +12,7 @@ var scatterPlotService = function () {
                 }), d3.max(dataset, function (d) {
                     return d.acc;
                 })])
-                .range([padding, w - padding * 2]);
+                .range([margin, size.width - margin * 2]);
 
             var yScale = d3.scale.linear()
                 .domain([d3.min(dataset, function (d) {
@@ -21,11 +20,11 @@ var scatterPlotService = function () {
                 }), d3.max(dataset, function (d) {
                     return d.mpg;
                 })])
-                .range([h - padding, padding]);
+                .range([size.height - margin, margin]);
 
             var categoryScale = d3.scale.category10();
 
-            var svg = scatterPlot.append("svg").attr("width", w).attr("height", h);
+            var svg = scatterPlot.append("svg").attr("width", size.width).attr("height", size.height);
             var tooltip = scatterPlot.append("div").attr("class", "tooltip").style("opacity", 0);
 
             //insert circles
@@ -66,32 +65,32 @@ var scatterPlotService = function () {
             svg.append("text")
                 .text("Acceleration")
                 .attr("text-anchor", "end")
-                .attr("transform", "translate(" + (w - padding * 2) + "," + (h - padding - 5) + ")")
+                .attr("transform", "translate(" + (size.width - margin * 2) + "," + (size.height - margin - 5) + ")")
 
             //add y-Axis label
             svg.append("text")
                 .text("Miles per gallon")
                 .attr("text-anchor", "end")
-                .attr("transform", "translate(" + (padding + 15) + "," + padding + ")rotate(270)")
+                .attr("transform", "translate(" + (margin + 15) + "," + margin + ")rotate(270)")
 
             //add x-Axis
             svg.append("g")
                 .attr("class", "axis")
-                .attr("transform", "translate(0," + (h - padding) + ")")
+                .attr("transform", "translate(0," + (size.height - margin) + ")")
                 .call(d3.svg.axis().scale(xScale).orient("bottom"));
 
             //add y-Axis
             svg.append("g")
                 .attr("class", "axis")
-                .attr("transform", "translate(" + padding + ",0)")
+                .attr("transform", "translate(" + margin + ",0)")
                 .call(d3.svg.axis().scale(yScale).orient("left"));
 
             //add legend
             svg
                 .append("foreignObject")
-                .attr("transform", "translate(0," + padding + ")")
+                .attr("transform", "translate(0," + margin + ")")
                 .attr("height", "100")
-                .attr("width", w - (padding * 2))
+                .attr("width", size.width - (margin * 2))
                 .append('xhtml:div')
                 .selectAll('div')
                 .data(countryHelper.getAvailableCountries)
