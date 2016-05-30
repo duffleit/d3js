@@ -29,31 +29,21 @@ var scatterPlotService = function () {
 
             var onBrushMove = function(){
 
-                brushArea = brush.extent();
+                var brushArea = brush.extent();
 
                 var brushCoordinates = {
-                    x1: brushArea[0][0],
-                    y1: brushArea[0][1],
-                    x2: brushArea[1][0],
-                    y2: brushArea[1][1]
+                    x1: brushArea[0][0], y1: brushArea[0][1],
+                    x2: brushArea[1][0], y2: brushArea[1][1]
                 };
 
+                svg.selectAll("circle").classed("out-of-brush", function (car) { car.selected = false; return false;});
                 svg.selectAll("circle").classed("out-of-brush", function (car) {
-                    car.selected = false;
-                    return false;
-                });
-
-                svg.selectAll("circle").classed("out-of-brush", function (car) {
-
                     var x = car.acc || 0;
                     var y = car.mpg || 0;
-
                     var con = x >= brushCoordinates.x1 && y >= brushCoordinates.y1 && x <= brushCoordinates.x2 && y <= brushCoordinates.y2;
-
                     if(con) car.selected = true;
                     return !con;
                 });
-
                 for(var i = 0; i < onSelectionChangedCallbacks.length; i++){
                     onSelectionChangedCallbacks[i]();
                 }
@@ -143,9 +133,7 @@ var scatterPlotService = function () {
                 .enter()
                 .append('div')
                 .attr("class", "legendItem")
-                .html(function (d) {
-                    return d;
-                })
+                .html(function (d) { return d; })
                 .style("border-color", categoryScale)
         }
     }
