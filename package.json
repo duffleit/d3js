@@ -2,7 +2,7 @@
   "name": "d3js-VisualizingCsvDataAsAnHtmlTable",
   "version": "1.0.0",
   "scripts": {
-    "serve": "ws --spa index.html"
+    "start": "ws --spa index.html"
   },
   "devDependencies": {
     "local-web-server": "^1.2.4"
