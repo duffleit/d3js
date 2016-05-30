@@ -135,10 +135,15 @@ var scatterPlotService = function () {
                 }
             };
 
+            var onBrushEnd = function() {
+                if (brush.empty()) svg.selectAll(".out-of-brush").classed("out-of-brush", false);
+            };
+
             var brush = d3.svg.brush()
                         .x(xScale)
                         .y(yScale)
                         .on("brush", onBrushMove)
+                        .on("brushend", onBrushEnd)
 
             svg
                 .append('g')
